@@ -23,16 +23,19 @@ jobs:
         with:
           # allow fetch-depth=0 so we can rebase/merge full history
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          submodules: 'recursive'
 
       - name: Configure Git user
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "Alex Navarro"
+          git config user.email "v-alex@mooreslab.ai"
 
       - name: Add upstream remote
         # replace with your upstream repo
-        run: git remote add upstream https://github.com/openai/gpt-oss.git
+        run: |
+          git remote add upstream https://github.com/openai/gpt-oss.git
+          git remote -v
 
       - name: Fetch upstream/main
         run: git fetch upstream
