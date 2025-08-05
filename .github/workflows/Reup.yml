@@ -41,10 +41,12 @@ jobs:
         run: git fetch upstream
 
       - name: Merge upstream into main
-        continue-on-error: true
         run: |
           git checkout main
-          git merge upstream/main --no-edit -X ours
+          SHA=$(git rev-parse --short upstream/main)
+          git merge upstream/main \
+            -X ours \
+            -m "[CICD] Reupped with latest main (commit $SHA) from upstream fork parent"
 
       - name: Push merged changes
         continue-on-error: true
