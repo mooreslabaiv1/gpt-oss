@@ -1,18 +1,21 @@
-<center>
 <img alt="gpt-oss-120" src="./docs/gpt-oss.svg">
-<p align="center"><br>
-<a href="https://gpt-oss.com" target="_blank">Try gpt-oss</a> | <a href="https://cookbook.openai.com/topic/gpt-oss">Guides</a> | <a href="https://openai.com/index/gpt-oss-model-card">Model card</a>
-<br><a href="https://openai.com/index/introducing-gpt-oss/">Learn more about OpenAI's open models</a><br>
-Download <a href="https://huggingface.co/openai/gpt-oss-120b">gpt-oss-120b</a> and <a href="https://huggingface.co/openai/gpt-oss-20b">gpt-oss-20b</a> on Hugging Face</a>
+<p align="center">
+  <a href="https://gpt-oss.com"><strong>Try gpt-oss</strong></a> ·
+  <a href="https://cookbook.openai.com/topic/gpt-oss"><strong>Guides</strong></a> ·
+  <a href="https://openai.com/index/gpt-oss-model-card"><strong>Model card</strong></a> ·
+  <a href="https://openai.com/index/introducing-gpt-oss/"><strong>OpenAI blog</strong></a>
 </p>
+<p align="center">
+  <strong>Download <a href="https://huggingface.co/openai/gpt-oss-120b">gpt-oss-120b</a> and <a href="https://huggingface.co/openai/gpt-oss-20b">gpt-oss-20b</a> on Hugging Face</a></strong>
+</p>
+
 <br>
-</center>
 
 Welcome to the gpt-oss series, [OpenAI's open-weight models](https://openai.com/open-models/) designed for powerful reasoning, agentic tasks, and versatile developer use cases.
 
-We're releasing two flavors of the open models:
+We're releasing two flavors of these open models:
 
-- `gpt-oss-120b` — for production, general purpose, high reasoning use cases that fits into a single H100 GPU (117B parameters with 5.1B active parameters)
+- `gpt-oss-120b` — for production, general purpose, high reasoning use cases that fit into a single H100 GPU (117B parameters with 5.1B active parameters)
 - `gpt-oss-20b` — for lower latency, and local or specialized use cases (21B parameters with 3.6B active parameters)
 
 Both models were trained on our [harmony response format][harmony] and should only be used with the harmony format as it will not work correctly otherwise.
@@ -73,7 +76,7 @@ vllm serve openai/gpt-oss-20b
 
 [Learn more about how to use gpt-oss with vLLM.](https://cookbook.openai.com/articles/gpt-oss/run-vllm)
 
-#### Pytorch / Triton / Metal
+#### PyTorch / Triton / Metal
 
 These implementations are largely reference implementations for educational purposes and are not expected to be run in production.
 
@@ -113,14 +116,14 @@ Check out our [awesome list](./awesome-gpt-oss.md) for a broader collection of g
 This repository provides a collection of reference implementations:
 
 - **Inference:**
-  - [`torch`](#reference-pytorch-implementation) — a non-optimized [Pytorch](https://pytorch.org/) implementation for educational purposes only. Requires at least 4x H100s because it's not optimized
-  - [`triton`](#reference-triton-implementation-single-gpu) — a more optimized implementation using [Pytorch](https://pytorch.org/) & [Triton](https://github.com/triton-lang/triton) incl. using CUDA graphs and basic caching
+  - [`torch`](#reference-pytorch-implementation) — a non-optimized [PyTorch](https://pytorch.org/) implementation for educational purposes only. Requires at least 4x H100s because it's not optimized
+  - [`triton`](#reference-triton-implementation-single-gpu) — a more optimized implementation using [PyTorch](https://pytorch.org/) & [Triton](https://github.com/triton-lang/triton) incl. using CUDA graphs and basic caching
   - [`metal`](#reference-metal-implementation) — a Metal-specific implementation for running the models on Apple Silicon hardware
 - **Tools:**
   - [`browser`](#browser) — a reference implementation of the browser tool the models got trained on
   - [`python`](#python) — a stateless reference implementation of the python tool the model got trained on
 - **Client examples:**
-  - [`chat`](#terminal-chat) — a basic terminal chat application that uses the Pytorch or Triton implementations for inference along with the python and browser tools
+  - [`chat`](#terminal-chat) — a basic terminal chat application that uses the PyTorch or Triton implementations for inference along with the python and browser tools
   - [`responses_api`](#responses-api) — an example Responses API compatible server that implements the browser tool along with other Responses-compatible functionality
 
 ## Setup
@@ -187,6 +190,13 @@ We also include an optimized reference implementation that uses [an optimized tr
 To install the reference Triton implementation run
 
 ```shell
+# You need to install triton from source to use the triton implementation
+git clone https://github.com/triton-lang/triton
+cd triton/
+pip install -r python/requirements.txt
+pip install -e . --verbose --no-build-isolation
+
+# Install the gpt-oss triton implementation
 pip install -e .[triton]
 ```
 
@@ -202,7 +212,7 @@ If you encounter `torch.OutOfMemoryError` make sure to turn on the expandable al
 
 ## Reference Metal implementation
 
-Additionally we are providing a reference implementation for Metal to run on Apple Silicon. This implementation is not production ready but is accurate to the Pytorch implementation.
+Additionally we are providing a reference implementation for Metal to run on Apple Silicon. This implementation is not production-ready but is accurate to the PyTorch implementation.
 
 The implementation will get automatically compiled when running the `.[metal]` installation on an Apple Silicon device:
 
@@ -238,7 +248,7 @@ We also include two system tools for the model: browsing and python container. C
 
 ### Terminal Chat
 
-The terminal chat application is a basic example on how to use the harmony format together with the Pytorch, Triton, and vLLM implementations. It also exposes both the python and browser tool as optional tools that can be used.
+The terminal chat application is a basic example on how to use the harmony format together with the PyTorch, Triton, and vLLM implementations. It also exposes both the python and browser tool as optional tools that can be used.
 
 ```bash
 usage: python -m gpt_oss.chat [-h] [-r REASONING_EFFORT] [-a] [-b] [--show-browser-results] [-p] [--developer-message DEVELOPER_MESSAGE] [-c CONTEXT] [--raw] [--backend {triton,torch,vllm}] FILE
@@ -392,14 +402,14 @@ To improve performance the tool caches requests so that the model can revisit a 
 
 ### Python
 
-The model got trained on using a python tool to perform calculations and other actions as part of its chain-of-thought. During the training the model used a stateful tool which makes running tools between CoT loops easier. This reference implementation, however, uses a stateless mode. As a result the PythonTool defines its own tool description to override the definition in [`openai-harmony`][harmony].
+The model was trained to use using a python tool to perform calculations and other actions as part of its chain-of-thought. During the training the model used a stateful tool which makes running tools between CoT loops easier. This reference implementation, however, uses a stateless mode. As a result the PythonTool defines its own tool description to override the definition in [`openai-harmony`][harmony].
 
 > [!WARNING]
 > This implementation runs in a permissive Docker container which could be problematic in cases like prompt injections. It's serving as an example and you should consider implementing your own container restrictions in production.
 
 #### Usage
 
-To enable the browser tool, you'll have to place the definition into the `system` message of your harmony formatted prompt. You can either use the `with_python()` method if your tool implements the full interface or modify the definition using `with_tools()`. For example:
+To enable the python tool, you'll have to place the definition into the `system` message of your harmony formatted prompt. You can either use the `with_python()` method if your tool implements the full interface or modify the definition using `with_tools()`. For example:
 
 ```python
 import datetime
@@ -426,7 +436,7 @@ if use_python_tool:
 system_message = Message.from_role_and_content(Role.SYSTEM, system_message_content)
 
 # create the overall prompt
-messages = [system_message, Message.from_role_and_content(Role.USER, "What's the squareroot of 9001?")]
+messages = [system_message, Message.from_role_and_content(Role.USER, "What's the square root of 9001?")]
 conversation = Conversation.from_messages(messages)
 
 # convert to tokens
@@ -436,7 +446,7 @@ token_ids = encoding.render_conversation_for_completion(conversation, Role.ASSIS
 # ...
 
 # parse the output
-messages = messages = encoding.parse_messages_from_completion_tokens(output_tokens, Role.ASSISTANT)
+messages = encoding.parse_messages_from_completion_tokens(output_tokens, Role.ASSISTANT)
 last_message = messages[-1]
 if last_message.recipient == "python":
   # perform python call
