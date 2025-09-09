@@ -1,6 +1,8 @@
 #pragma once
 
-#include <stdatomic.h>
+#ifndef __cplusplus
+    #include <stdatomic.h>
+#endif
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -9,7 +11,11 @@
 
 
 struct gptoss_tokenizer {
+#ifndef __cplusplus
     atomic_uint_least64_t ref_count;
+#else
+    uint_least64_t ref_count;
+#endif
 
     void* mapping_ptr;
     size_t mapping_size;
@@ -24,7 +30,11 @@ struct gptoss_tokenizer {
 };
 
 struct gptoss_model {
+#ifndef __cplusplus
     atomic_uint_least64_t ref_count;
+#else
+    uint_least64_t ref_count;
+#endif
 
     struct gptoss_tokenizer* tokenizer;
 
@@ -77,6 +87,7 @@ struct gptoss_model {
     struct gptoss_metal_function f32_topk_softmax_e128_k4_fn;
     struct gptoss_metal_function f32_sdpa_q8_d64_fn;
     struct gptoss_metal_function f32_softmax_fn;
+    struct gptoss_metal_function f32_sample_fn;
 
     size_t per_block_shared_weights_size;
     size_t per_expert_block_weight_size;
@@ -107,7 +118,11 @@ struct gptoss_model {
 #define GPTOSS_DEFAULT_BATCH_SIZE 128
 
 struct gptoss_context {
+#ifndef __cplusplus
     atomic_uint_least64_t ref_count;
+#else
+    uint_least64_t ref_count;
+#endif
 
     struct gptoss_model* model;
     // Number of tokens processed in the context.
@@ -138,13 +153,4 @@ struct gptoss_context {
     struct gptoss_metal_buffer sum_buffer;
     struct gptoss_metal_buffer argmax_buffer;
     struct gptoss_metal_buffer kvcache_buffer;
-};
-
-struct gptoss_sampler {
-    atomic_uint_least64_t ref_count;
-
-    float temperature;
-    float top_p;
-    float presence_penalty;
-    float frequency_penalty;
 };
