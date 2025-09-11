@@ -78,6 +78,9 @@ struct gptoss_model {
     struct gptoss_metal_function bf16_f32_embeddings_fn;
     struct gptoss_metal_function f32_bf16w_rmsnorm_fn;
     struct gptoss_metal_function f32_bf16w_matmul_fn;
+    struct gptoss_metal_function f32_bf16w_dense_matmul_qkv_fn;
+    struct gptoss_metal_function f32_bf16w_dense_matmul_attn_output_fn;
+    struct gptoss_metal_function f32_bf16w_dense_matmul_mlp_gate_fn;
     struct gptoss_metal_function f32_bf16w_unembedding_fn;
     struct gptoss_metal_function f32_rope_fn;
     struct gptoss_metal_function f32_mf4w_moe_matmul_swiglu_fn;
@@ -91,6 +94,15 @@ struct gptoss_model {
 
     size_t per_block_shared_weights_size;
     size_t per_expert_block_weight_size;
+
+    size_t embeddings_threadgroup_size;
+    size_t attn_qkv_threadgroup_size;
+    size_t attn_out_threadgroup_size;
+    size_t mlp_gate_threadgroup_size;
+    size_t mlp_swiglu_threadgroup_size;
+    size_t mlp_out_threadgroup_size;
+    size_t mlp_acc_threadgroup_size;
+    size_t unembedding_threadgroup_size;
 
     size_t attn_rmsnorm_gain_offset;
     size_t attn_qkv_weight_offset;

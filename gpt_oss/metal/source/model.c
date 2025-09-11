@@ -325,6 +325,18 @@ enum gptoss_status GPTOSS_ABI gptoss_model_create_from_file(
     if (status != gptoss_status_success) {
         goto cleanup;
     }
+    status = gptoss_metal_function_create(&model->library, "gptoss_f32_bf16w_dense_matmul_qkv", &model->f32_bf16w_dense_matmul_qkv_fn);
+    if (status != gptoss_status_success) {
+        goto cleanup;
+    }
+    status = gptoss_metal_function_create(&model->library, "gptoss_f32_bf16w_dense_matmul_attn_output", &model->f32_bf16w_dense_matmul_attn_output_fn);
+    if (status != gptoss_status_success) {
+        goto cleanup;
+    }
+    status = gptoss_metal_function_create(&model->library, "gptoss_f32_bf16w_dense_matmul_mlp_gate", &model->f32_bf16w_dense_matmul_mlp_gate_fn);
+    if (status != gptoss_status_success) {
+        goto cleanup;
+    }
     status = gptoss_metal_function_create(&model->library, "gptoss_f32_bf16w_unembedding", &model->f32_bf16w_unembedding_fn);
     if (status != gptoss_status_success) {
         goto cleanup;
@@ -365,6 +377,16 @@ enum gptoss_status GPTOSS_ABI gptoss_model_create_from_file(
     if (status != gptoss_status_success) {
         goto cleanup;
     }
+
+    // Kernel launch parameters
+    model->embeddings_threadgroup_size = 512;
+    model->attn_qkv_threadgroup_size = 1024;
+    model->attn_out_threadgroup_size = 768;
+    model->mlp_gate_threadgroup_size = 256;
+    model->mlp_swiglu_threadgroup_size = 192;
+    model->mlp_out_threadgroup_size = 192;
+    model->mlp_acc_threadgroup_size = 768;
+    model->unembedding_threadgroup_size = 416;
 
     // Weight buffers
     const char* current_ptr = (const char*) model->mapping_ptr;
@@ -492,6 +514,9 @@ enum gptoss_status GPTOSS_ABI gptoss_model_release(
             gptoss_metal_function_release(&model->bf16_f32_embeddings_fn);
             gptoss_metal_function_release(&model->f32_bf16w_rmsnorm_fn);
             gptoss_metal_function_release(&model->f32_bf16w_matmul_fn);
+            gptoss_metal_function_release(&model->f32_bf16w_dense_matmul_qkv_fn);
+            gptoss_metal_function_release(&model->f32_bf16w_dense_matmul_attn_output_fn);
+            gptoss_metal_function_release(&model->f32_bf16w_dense_matmul_mlp_gate_fn);
             gptoss_metal_function_release(&model->f32_bf16w_unembedding_fn);
             gptoss_metal_function_release(&model->f32_rope_fn);
             gptoss_metal_function_release(&model->f32_mf4w_moe_matmul_swiglu_fn);
